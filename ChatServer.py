@@ -42,3 +42,4 @@ if __name__ == '__main__':
 
     port = int(sys.argv[2])
     server = UDP_Socket_Server(port)
+    server.listen_on_port()
