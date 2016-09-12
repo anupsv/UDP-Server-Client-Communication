@@ -64,17 +64,6 @@ class UDP_Socket_Client:
 
 if __name__ == '__main__':
 
-    ## DELETE
-
-    server = UDP_Socket_Client("localhost", 9090)
-
-    server.greetServer()
-    server.msgSendingReceivingService()
-    #thread.start_new_thread(server.msgRecvService(), ())
-
-    sys.exit()
-    ## DELETE
-
     if len(sys.argv) != 5:
         print "Insufficient Parameters passed. Please check again."
         exit()

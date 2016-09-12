@@ -33,8 +33,6 @@ class UDP_Socket_Server:
 
 if __name__ == '__main__':
 
-    server = UDP_Socket_Server(9090)
-    server.listen_on_port()
     if len(sys.argv) != 3:
         print "Insufficient Parameters passed. Please check again."
         exit()
