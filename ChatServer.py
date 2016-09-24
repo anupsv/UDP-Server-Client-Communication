@@ -4,7 +4,6 @@ import sys
 
 class UDP_Socket_Server:
     def __init__(self, port):
-
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         except:
@@ -27,7 +26,6 @@ class UDP_Socket_Server:
         while True:
             try:
                 data, address = self.sock.recvfrom(4096)
-
             except:
                 print 'Failed to receive using the socket'
                 sys.exit()
@@ -40,7 +38,6 @@ class UDP_Socket_Server:
                 self.sockets.add(address)
 
             if data.startswith("MESSAGE"):
-
                 for tmpaddr in self.sockets:
                     print "Sending message to client {}:{}".format(address[0],address[1])
                     tosend = "<-INCOMING From <{}:{}> : {}".format(address[0], address[1], data[8:])

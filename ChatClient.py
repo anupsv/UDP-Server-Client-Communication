@@ -5,7 +5,6 @@ import select
 
 class UDP_Socket_Client:
     def __init__(self, server_ip, server_port):
-
         try:
             if not self.hostname_ip_exists(server_ip):
                 print "The given server ip/hostname could not be found.\nHost : {}\nPort : {}\nExiting now.".format(server_ip,server_port)
@@ -33,11 +32,9 @@ class UDP_Socket_Client:
 
     # this function sends "GREETING" to the server as per protocol specification
     def greetServer(self):
-
         try:
             greetMsg = "GREETING"
             self.sock.sendto(greetMsg, self.server_address)
-
         except socket.error, msg:
             print 'ERROR : Could not send "GREETING" to server.\nError Code {}\nReason : {}\n Exiting now.'.format(str(msg[0]), msg[1])
             self.sock.close()
@@ -69,7 +66,6 @@ class UDP_Socket_Client:
                 sys.stdout.write('')
                 sys.stdout.flush()
 
-
             else:
                 data = self.sock.recv(4096)
                 print data + "\n+>"
@@ -78,7 +74,6 @@ class UDP_Socket_Client:
 if __name__ == '__main__':
 
     try:
-
         # Checking if required number of parameters are given.
         # Also checks if invalid options are submitted.
         # Adheres to Standards of linux script and exists if invalid option is supplied.
