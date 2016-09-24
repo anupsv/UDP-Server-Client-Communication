@@ -1,45 +1,73 @@
 import socket
 import sys
-from optparse import OptionParser
 
 
 class UDP_Socket_Server:
+    def __init__(self, port):
 
-    def __init__(self,port):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        server_address = ('localhost', port)
-        print 'starting up on %s port {}'.format(server_address)
-        self.sock.bind(server_address)
+        try:
+            self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        except:
+            print 'Failed to create socket on the machine.'
+            sys.exit()
+
+        server_address = ('127.0.0.1', port)
+        print 'starting up on {}'.format(server_address)
+
+        try:
+            self.sock.bind(server_address)
+        except:
+            print 'Failed to bind socket on the Port :'.format(port)
+            sys.exit()
+
+        # Set of sockets that sent GREETING messages.
         self.sockets = set()
 
     def listen_on_port(self):
         while True:
-            data, address = self.sock.recvfrom(4096)
+            try:
+                data, address = self.sock.recvfrom(4096)
 
-            print 'Received input {} bytes from {} : {}'.format(len(data), address,data)
+            except:
+                print 'Failed to receive using the socket'
+                sys.exit()
+
+            print 'Received input {} bytes from {} : {}'.format(len(data), address, data)
             print "address : ", address
 
             if data == "GREETING":
-                print "adding......."
+                print "Greeting detected, Adding host {} to list.......".format(str(address[0]))
                 self.sockets.add(address)
 
             if data.startswith("MESSAGE"):
 
                 for tmpaddr in self.sockets:
-                    print "SENDING..."
-                    tosend = "INCOMING From <{}:{}> : {}".format(address[0],address[1],data[8:])
-                    self.sock.sendto(tosend, tmpaddr)
+                    print "Sending message to client {}:{}".format(address[0],address[1])
+                    tosend = "<-INCOMING From <{}:{}> : {}".format(address[0], address[1], data[8:])
+                    try:
+                        self.sock.sendto(tosend, tmpaddr)
+                    except:
+                        print 'Failed to send data through socket.'
+                        sys.exit()
 
 
 if __name__ == '__main__':
 
-    if len(sys.argv) != 3:
-        print "Insufficient Parameters passed. Please check again."
-        exit()
-    elif int(sys.argv[2]) <= 0:
-        print "Weird port detected. Please Check the port number."
-        exit()
+    # Checking if required number of parameters are given.
+    # Also checks if invalid options are submitted.
+    # Adheres to Standards of linux script and exists if invalid option is supplied.
+    try:
+        if len(sys.argv) != 3:
+            print "!! ERROR !! : Insufficient Parameters passed. Please check again."
+            exit()
+        elif int(sys.argv[2]) <= 0:
+            print "!! ERROR !! : Weird port detected. Please Check the port number."
+            exit()
 
-    port = int(sys.argv[2])
-    server = UDP_Socket_Server(port)
-    server.listen_on_port()
+        port = int(sys.argv[2])
+        server = UDP_Socket_Server(port)
+        server.listen_on_port()
+
+    except KeyboardInterrupt:
+        print '\nKeyBoard Interrupt Detected. Shutting down server.'
+        sys.exit(0)
