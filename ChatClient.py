@@ -51,8 +51,11 @@ class UDP_Socket_Client:
         while True:
             try:
                 r, w, x = select.select([sys.stdin, self.sock], [], [])
+            except KeyboardInterrupt:
+                print '\nKeyBoard Interrupt Detected. Shutting down client.'
+                sys.exit(0)
             except:
-                print "Python select trew error switching between std i/o and socket connection. Please check"
+                print "Python select threw error switching between std i/o and socket connection. Please check"
                 sys.exit()
             if not r:
                 continue
@@ -61,7 +64,7 @@ class UDP_Socket_Client:
                 data = raw_input()
                 try:
                     data = "MESSAGE {}".format(str(data))
-                    print " LEN : ", len(data)
+                    #print " LEN : ", len(data)
                     self.sock.sendto(data, self.server_address)
 
                 except:
@@ -74,9 +77,9 @@ class UDP_Socket_Client:
             else:
                 try:
                     data = self.sock.recv(4096)
-                    print data + "\n+>"
                 except:
                     print "Failed to receive on the socket from the server"
+                print data + "\n+>"
 
 
 if __name__ == '__main__':
