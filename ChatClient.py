@@ -57,6 +57,7 @@ class UDP_Socket_Client:
                 data = raw_input()
                 try:
                     data = "MESSAGE {}".format(data)
+                    data = data[0:4095]
                     self.sock.sendto(data, self.server_address)
 
                 except socket.error, msg:

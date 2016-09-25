@@ -10,7 +10,7 @@ class UDP_Socket_Server:
             print 'Failed to create socket on the machine.'
             sys.exit()
 
-        server_address_tuple = ('127.0.0.1', port)
+        server_address_tuple = (socket.gethostbyname(socket.gethostname()), port)
         print 'starting up on {}'.format(server_address_tuple)
 
         try:
