@@ -9,13 +9,13 @@ class UDP_Socket_Client:
             if not self.hostname_ip_exists(server_ip):
                 print "The given server ip/hostname could not be found.\nHost : {}\nPort : {}\nExiting now.".format(server_ip,server_port)
                 sys.exit()
-        except socket.error, msg:
+        except:
             print "Could not verify existance of host / IP. Exiting Now."
             sys.exit()
 
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        except socket.error, msg:
+        except:
             print 'Failed to create message sending socket. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
             sys.exit()
 
@@ -35,8 +35,8 @@ class UDP_Socket_Client:
         try:
             greetMsg = "GREETING"
             self.sock.sendto(greetMsg, self.server_address)
-        except socket.error, msg:
-            print 'ERROR : Could not send "GREETING" to server.\nError Code {}\nReason : {}\n Exiting now.'.format(str(msg[0]), msg[1])
+        except:
+            print 'ERROR : Could not send "GREETING" to server.\nError Code {}\nReason : {}\n Exiting now.'
             self.sock.close()
             exit()
 
@@ -49,7 +49,11 @@ class UDP_Socket_Client:
         sys.stdout.write('+>')
         sys.stdout.flush()
         while True:
-            r, w, x = select.select([sys.stdin, self.sock], [], [])
+            try:
+                r, w, x = select.select([sys.stdin, self.sock], [], [])
+            except:
+                print "Python select trew error switching between std i/o and socket connection. Please check"
+                sys.exit()
             if not r:
                 continue
             if r[0] is sys.stdin:
@@ -60,19 +64,25 @@ class UDP_Socket_Client:
                     print " LEN : ", len(data)
                     self.sock.sendto(data, self.server_address)
 
-                except socket.error, msg:
-                    print 'Failed to send message to server. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
+                except:
+                    print 'Failed to send message to server.'
                     sys.exit()
 
                 sys.stdout.write('')
                 sys.stdout.flush()
 
             else:
-                data = self.sock.recv(4096)
-                print data + "\n+>"
+                try:
+                    data = self.sock.recv(4096)
+                    print data + "\n+>"
+                except:
+                    print "Failed to receive on the socket from the server"
 
 
 if __name__ == '__main__':
+
+    def usage():
+        print "\nUSAGE : \n\t-sip : Server IP Address\n\t-sp : Server Port."
 
     try:
         # Checking if required number of parameters are given.
@@ -83,6 +93,7 @@ if __name__ == '__main__':
                 print "!! ERROR !! : Insufficient Parameters passed. Please check again."
             elif len(sys.argv) > 5:
                 print "!! ERROR !! : Invalid Additional Parameters detected."
+            usage()
             exit()
 
         # map all argv in dictionary for ease of access, exclude argv[0] as its the script.
@@ -93,10 +104,24 @@ if __name__ == '__main__':
 
             argvmap[sys.argv[i]] = sys.argv[i+1]
 
-        serverIp = argvmap["-sip"]
-        serverPort = int(argvmap["-sp"])
+        if "-sip" not in argvmap:
+            print "!! ERROR !! : Server IP required. '-sip' command line option."
+            usage()
+            sys.exit()
+        elif "-sp" not in argvmap:
+            print "!! ERROR !! : Server port required. '-sp' command line option."
+            usage()
+            sys.exit()
 
-        if int(serverPort) <= 0:
+        serverIp = argvmap["-sip"]
+
+        try:
+            serverPort = int(argvmap["-sp"])
+        except:
+            print "Server port input was not integer, Please enter correct port number between 1024-65535."
+            sys.exit()
+
+        if int(serverPort) <= 0 or serverPort > 65535:
             print "Weird port detected. Please Check the port number."
             exit()
 
