@@ -10,17 +10,17 @@ class UDP_Socket_Server:
             print 'Failed to create socket on the machine.'
             sys.exit()
 
-        server_address = ('127.0.0.1', port)
-        print 'starting up on {}'.format(server_address)
+        server_address_tuple = ('127.0.0.1', port)
+        print 'starting up on {}'.format(server_address_tuple)
 
         try:
-            self.sock.bind(server_address)
+            self.sock.bind(server_address_tuple)
         except:
             print 'Failed to bind socket on the Port :'.format(port)
             sys.exit()
 
         # Set of sockets that sent GREETING messages.
-        self.sockets = set()
+        self.client_socket_list = set()
 
     def listen_on_port(self):
         while True:
@@ -31,18 +31,17 @@ class UDP_Socket_Server:
                 sys.exit()
 
             print 'Received input {} bytes from {} : {}'.format(len(data), address, data)
-            print "address : ", address
 
             if data == "GREETING":
                 print "Greeting detected, Adding host {} to list.......".format(str(address[0]))
-                self.sockets.add(address)
+                self.client_socket_list.add(address)
 
-            if data.startswith("MESSAGE"):
-                for tmpaddr in self.sockets:
-                    print "Sending message to client {}:{}".format(address[0],address[1])
+            if data.startswith("MESSAGE", 0, 7):
+                for _client in self.client_socket_list:
+                    # print "Sending message to client {}:{}".format(address[0],address[1])
                     tosend = "<-INCOMING From <{}:{}> : {}".format(address[0], address[1], data[8:])
                     try:
-                        self.sock.sendto(tosend, tmpaddr)
+                        self.sock.sendto(tosend, _client)
                     except:
                         print 'Failed to send data through socket.'
                         sys.exit()
